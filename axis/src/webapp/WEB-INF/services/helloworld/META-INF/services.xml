@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service name="helloService">
+	<description>
+	Katie tests hello world
+	</description>
+	
+	<parameter name="ServiceClass" locked="false">
+		org.sakaiproject.axis.util.helloworld
+	</parameter>
+	
+	<operation name="sayHello">
+		<messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+	</operation>
+
+</service>
