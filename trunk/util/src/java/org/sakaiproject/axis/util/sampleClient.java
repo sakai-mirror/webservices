@@ -9,7 +9,7 @@ import javax.xml.stream.*;
 
 public class sampleClient {
 	
-	private static String toEpr = "http://localhost:8080/axis2/services/helloService/sayHello";
+	private static String toEpr = "http://localhost:8080/hello-0.1/services/helloService/sayHello";
 	
 	public static void main(String[] args) throws AxisFault {
 		
