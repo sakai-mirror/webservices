@@ -23,6 +23,21 @@
             <artifactId>axis2</artifactId>
             <version>1.4</version>
         </dependency>
+                <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2-kernel</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2-codegen</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2-adb</artifactId>
+            <version>1.0</version>
+        </dependency>
         <!--AXIOM Dependencies-->
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
@@ -69,18 +84,18 @@
 	    </exclusions>
         </dependency>
         <dependency>
-  	    <groupId>org.apache.woden</groupId>
-  	    <artifactId>woden-api</artifactId>
+	  	    <groupId>org.apache.woden</groupId>
+	  	    <artifactId>woden-api</artifactId>
   	    <version>1.0M8</version>
         </dependency>
         <dependency>
-  	    <groupId>org.apache.woden</groupId>
-  	    <artifactId>woden-impl-dom</artifactId>
+	  	    <groupId>org.apache.woden</groupId>
+	  	    <artifactId>woden-impl-dom</artifactId>
   	    <version>1.0M8</version>
         </dependency>
         <dependency>
-  	    <groupId>org.apache.woden</groupId>
-  	    <artifactId>woden-impl-om</artifactId>
+	  	    <groupId>org.apache.woden</groupId>
+	  	    <artifactId>woden-impl-om</artifactId>
   	    <version>1.0M8</version>
         </dependency>
         <dependency>
@@ -137,6 +152,16 @@
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xmlbeans</groupId>
+            <artifactId>xbean</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>annogen</groupId>
+            <artifactId>annogen</artifactId>
+            <version>0.1.0</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.sun.jmx</groupId>-->

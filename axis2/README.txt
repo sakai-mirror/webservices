@@ -1,3 +1,7 @@
--copy axis/src/webapp/WEB-INF/services/helloworld folder into $CATALINA_HOME/webapps/axis2/WEB-INF/services
--restart Tomcat
-You can then run sampleClient to test the service.
+helloService : Should be able to deploy on it's own now.
+-Switch to directory axis2
+-type (sudo) mvn war:war
+- move ./target/sakai-axis2-0.1.war into $CATALINA_HOME/webapps
+- restart tomcat
+
+Run sampleClient.java as a simple test to see everything's working OK.
