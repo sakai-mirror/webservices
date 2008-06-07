@@ -23,7 +23,7 @@
             <artifactId>axis2</artifactId>
             <version>1.4</version>
         </dependency>
-                <dependency>
+        <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
             <version>1.0</version>
@@ -163,21 +163,6 @@
             <artifactId>annogen</artifactId>
             <version>0.1.0</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.sun.jmx</groupId>-->
-<!--            <artifactId>jmxri</artifactId>-->
-<!--            <version>1.2.1</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.sun.jdmk</groupId>-->
-<!--            <artifactId>jmxtools</artifactId>-->
-<!--            <version>1.2.1</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>javax.jms</groupId>-->
-<!--            <artifactId>jms</artifactId>-->
-<!--            <version>1.1</version>-->
-<!--        </dependency>-->
         
 <!--        <dependency>-->
 <!--	      <groupId>org.sakaiproject</groupId>-->
@@ -200,61 +185,29 @@
     <build>
 
         <plugins>
-
             <plugin>
-
                 <groupId>org.apache.maven.plugins</groupId>
-
                 <artifactId>maven-war-plugin</artifactId>
-
                 <configuration>
-
                     <warSourceDirectory>${basedir}/src/webapp</warSourceDirectory>
-
                 </configuration>
-
             </plugin>
-
         </plugins>
 
-        <sourceDirectory>../util/src/java</sourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
 
         <testSourceDirectory>src/test</testSourceDirectory>
 
-        <resources>
-
-            <resource>
-
-                <directory>src/main</directory>
-
-                <includes>
-
-                    <include>**/*.xml</include>
-
-                </includes>
-
-            </resource>
-
-        </resources>
 
         <testResources>
-
             <testResource>
-
                 <directory>src/test</directory>
-
                 <includes>
-
                     <include>**/*.xml</include>
-
                     <include>**/*.properties</include>
-
                     <include>**/*.wsdl</include>
-
                 </includes>
-
             </testResource>
-
         </testResources>
 
     </build>
@@ -264,43 +217,26 @@
     <!--  needed for XmlSchema -->
 
     <repositories>
-
         <repository>
-
             <id>ibiblio</id>
-
             <name>ibiblio maven repository</name>
-
             <url>http://ibiblio.org/maven/</url>
-
             <layout>legacy</layout>
-
         </repository>
 
         <repository>
-
             <id>apache</id>
-
             <name>Apache maven repository</name>
-
             <url>http://www.apache.org/dist/java-repository/</url>
-
             <layout>legacy</layout>
-
         </repository>
         
         <repository>
-        
 			  <id>java.net</id>
-			  
 			  <url>http://download.java.net/maven/1</url>
-			  
 			  <layout>legacy</layout>
-	  
 		</repository>
-
     </repositories>
-
 
 
 </project>

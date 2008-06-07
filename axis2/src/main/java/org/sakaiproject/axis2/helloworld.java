@@ -1,4 +1,4 @@
-package org.sakaiproject.axis.util;
+package org.sakaiproject.axis2;
 import org.apache.axiom.om.*;
 import javax.xml.stream.*;
 import org.apache.axis2.AxisFault;
