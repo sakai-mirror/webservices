@@ -6,7 +6,7 @@
 	</description>
 	
 	<parameter name="ServiceClass" locked="false">
-		org.sakaiproject.axis.util.helloworld
+		org.sakaiproject.axis2.helloworld
 	</parameter>
 	
 	<operation name="sayHello">
