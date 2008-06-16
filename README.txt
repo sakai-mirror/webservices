@@ -11,6 +11,7 @@ WRITING A NEW WEBSERVICE:
 <?xml version="1.0" encoding="UTF-8"?>
 
 <service name="Name_of_service">
+
 	<description>
 		bla bla bla
 	</description>
@@ -26,8 +27,7 @@ WRITING A NEW WEBSERVICE:
         <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
                          class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
     </messageReceivers>
-	
-
+    
 </service>
 
 4) From inside axis2 directory type sudo mvn compile war:war, and place the resulting war file

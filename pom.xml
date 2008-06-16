@@ -21,6 +21,6 @@
 
   <modules>
     <module>axis</module>
-    <module>util</module>
+    <module>axis2</module>
   </modules>
 </project>

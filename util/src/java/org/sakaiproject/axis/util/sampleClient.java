@@ -10,7 +10,7 @@ import javax.xml.stream.*;
 
 public class sampleClient {
 	
-	private static String toEpr = "http://localhost:8080/sakai-axis2-0.1/services/helloAgainService/sayHello";
+	private static String toEpr = "http://localhost:8080/sakai-axis2/services/EchoService/echo";
 	
 	public static void main(String[] args) throws AxisFault {
 		
@@ -41,14 +41,14 @@ public class sampleClient {
 //	        }
 	}
 	
-	private static OMElement getPayload(String person) {
+	private static OMElement getPayload(String name) {
 		OMFactory factory = OMAbstractFactory.getOMFactory();
 		OMNamespace ns = factory.createOMNamespace("www.EXAMPLE.com", "PERSON");
 		
 		OMElement method = factory.createOMElement("sayHello", ns);
-		OMElement value = factory.createOMElement("person", ns);
+		OMElement value = factory.createOMElement("name", ns);
 		
-		value.addChild(factory.createOMText(value, person));
+		value.addChild(factory.createOMText(value, name));
 		
 		method.addChild(value);
 		return method;
