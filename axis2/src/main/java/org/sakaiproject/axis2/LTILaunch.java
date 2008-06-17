@@ -12,10 +12,18 @@ import javax.xml.namespace.*;
 public class LTILaunch {
 	public OMFactory factory = OMAbstractFactory.getOMFactory();
 	
-	public OMElement nonce(OMElement request) {
+	public OMElement testlaunch(OMElement request) {
 		request.build();
 		request.detach();
-
+		
+		OMElement launchResponse = factory.createOMElement(new QName("launchResponse"));
+		
+		OMElement siteID_el = request.getFirstChildWithName(new QName("toolID"));
+		String siteID = siteID_el.getText();
+		
+		OMElement toolID_el = request.getFirstChildWithName(new QName("toolID"));
+		String toolID = toolID_el.getText();
+		
 		String secret = "secret";
 		
 		OMElement nonce_el = request.getFirstChildWithName(new QName("sec_nonce"));
@@ -43,7 +51,6 @@ public class LTILaunch {
 		
 		boolean success = digest.equals(sha1);
 		
-		OMElement launchResponse = factory.createOMElement(new QName("launchResponse"));
 		OMElement status = factory.createOMElement(new QName("status"));
 		
 		
