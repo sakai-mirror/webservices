@@ -118,7 +118,7 @@ public class LTILaunch {
 		else
 			height = "344";
 		
-		widget.setText("&lt;object width=\"" + width +"\" height=\""+ height + "\"&gt;&lt;param name=\"movie\" value=\"http://www.youtube.com/v/f90ysF9BenI&amp;hl=en\"&gt;&lt;/param&gt;&lt;embed src=\"http://www.youtube.com/v/f90ysF9BenI&amp;hl=en\" type=\"application/x-shockwave-flash\" width=\"" + width + "\" height=\"" + height + "\"&gt;&lt;/embed&gt;&lt;/object&gt;");
+		widget.setText("<object width=\"" + width +"\" height=\""+ height + "\"><param name=\"movie\" value=\"http://www.youtube.com/v/f90ysF9BenI&hl=en\"></param><embed src=\"http://www.youtube.com/v/f90ysF9BenI&hl=en\" type=\"application/x-shockwave-flash\" width=\"" + width + "\" height=\"" + height + "\"></embed></object>");
 		
 		return widget;
 	}
