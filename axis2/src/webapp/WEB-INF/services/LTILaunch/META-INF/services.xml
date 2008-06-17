@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service name="LTILaunch">
+	<description>
+	Testing the LTI 
+	</description>
+	
+	<parameter name="ServiceClass" locked="false">
+		org.sakaiproject.axis2.LTILaunch
+	</parameter>
+	
+	<operation name="nonce">
+
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+
+        <actionMapping>urn:nonce</actionMapping>on
+
+    </operation>
+	
+</service>
