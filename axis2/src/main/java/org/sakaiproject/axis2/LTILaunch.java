@@ -74,10 +74,10 @@ public class LTILaunch {
 			}
 			else {
 				type.setText("iFrame");
-				OMElement launchURL = factory.createOMElement(new QName("launchURL"));
-				launchURL.setText("http://www.youtube.com/v/f90ysF9BenI");
+				OMElement launchUrl = factory.createOMElement(new QName("launchUrl"));
+				launchUrl.setText("http://www.youtube.com/v/f90ysF9BenI");
 				launchResponse.addChild(type);
-				launchResponse.addChild(launchURL);
+				launchResponse.addChild(launchUrl);
 			}
 			
 		}
