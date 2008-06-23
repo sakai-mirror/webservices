@@ -35,7 +35,7 @@ public class SakaiLogin
 		throw new AxisFault("Web Services Login Disabled");
 	}
 
-        User user = UserDirectoryService.authenticate(id,pw);
+    User user = UserDirectoryService.authenticate(id,pw);
 	if ( user != null ) {
                 Session s = SessionManager.startSession();
                 SessionManager.setCurrentSession(s);

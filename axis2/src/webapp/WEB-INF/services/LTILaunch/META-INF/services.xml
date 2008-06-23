@@ -9,12 +9,13 @@
 		org.sakaiproject.axis2.LTILaunch
 	</parameter>
 	
-	<operation name="nonce">
+	<operation name="testlaunch">
 
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
 
-        <actionMapping>urn:nonce</actionMapping>on
+        <actionMapping>urn:testlaunch</actionMapping>on
 
     </operation>
 	
+    
 </service>

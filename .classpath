@@ -38,5 +38,12 @@
 	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/ws-commons/axiom-api/1.0/axiom-api-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/ws-commons/axiom-impl/1.0/axiom-impl-1.0.jar"/>
+	<classpathentry kind="lib" path="/sakai-mock/target/sakai-mock-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/site-api/api/target/sakai-site-api-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/tool-api/api/target/sakai-tool-api-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/util-api/api/target/sakai-util-api-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/user-api/api/target/sakai-user-api-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/entity-api/api/target/sakai-entity-api-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/event-api/api/target/sakai-event-api-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
