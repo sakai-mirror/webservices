@@ -31,7 +31,7 @@ public class LTILaunch {
 	private boolean CHECK_LOGIN = false;
 	private final String secret = "secret";
 	
-	public OMElement testlaunch(OMElement request) {
+	public OMElement testlaunch(OMElement request) throws AxisFault {
 		request.build();
 		request.detach();
 		
@@ -91,6 +91,13 @@ public class LTILaunch {
 		}
 		catch(Exception e) {
 			CHECK_SITE = false;
+		}
+		
+		try {
+			SiteService.join(siteId);
+		}
+		catch(Exception e) {
+			throw new AxisFault("Could not join site " + siteId);
 		}
 	
 		boolean success = CHECK_DIGEST && CHECK_TIME && CHECK_SITE && CHECK_LOGIN;
