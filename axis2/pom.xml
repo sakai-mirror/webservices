@@ -166,6 +166,11 @@
 		<!--SAKAI Dependencies-->
 		<dependency>
 	      <groupId>org.sakaiproject</groupId>
+	      <artifactId>sakai-authz-api</artifactId>
+	      <version>${sakai.version}</version>
+   		</dependency>
+		<dependency>
+	      <groupId>org.sakaiproject</groupId>
 	      <artifactId>sakai-entity-api</artifactId>
 	      <version>${sakai.version}</version>
    		</dependency>

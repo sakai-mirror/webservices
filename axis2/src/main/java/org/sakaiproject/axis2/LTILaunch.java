@@ -8,6 +8,7 @@ import org.apache.axis2.context.MessageContext;
 import java.io.UnsupportedEncodingException; 
 import java.security.NoSuchAlgorithmException; 
 import java.security.MessageDigest;
+import java.util.Properties;
 
 import javax.xml.namespace.*;
 import org.sakaiproject.site.api.ToolConfiguration;
@@ -20,6 +21,7 @@ import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.tool.cover.ToolManager;
 
 
 
@@ -29,7 +31,8 @@ public class LTILaunch {
 	private boolean CHECK_DIGEST = false;
 	private boolean CHECK_SITE = false;
 	private boolean CHECK_LOGIN = false;
-	private final String secret = "secret";
+	private final static String SECRET = "sakai.ims.lti.secret";
+	private String secret;// = "secret";
 	
 	public OMElement testlaunch(OMElement request) throws AxisFault {
 		request.build();
@@ -52,6 +55,12 @@ public class LTILaunch {
 		OMElement digest_el = request.getFirstChildWithName(new QName("sec_digest"));
 		String digest = digest_el.getText();
 		
+		try {
+			secret = findSecret(toolID);
+		}catch (Exception e) {
+			throw new AxisFault("Error validating secret");
+		}
+		
 		String presha1 = nonce + created + secret;
 		String sha1 = null;
 		
@@ -70,17 +79,23 @@ public class LTILaunch {
 		CHECK_TIME = TimeCalculator.within2Days(created);
 		
 		String sessionId = null;
-		try {
-			sessionId = loginCreateSession(request.getFirstChildWithName(new QName("user_id")),
-					request.getFirstChildWithName(new QName("user_firstname")),
-					request.getFirstChildWithName(new QName("user_lastname")), 
-					request.getFirstChildWithName(new QName("user_email")));
-			CHECK_LOGIN = true;
-		}
-		catch(Exception e) {
-			CHECK_LOGIN = false;
+		//attempt login if security check passed
+		if (CHECK_DIGEST && CHECK_TIME) {
+			try {
+				sessionId = loginCreateSession(request
+						.getFirstChildWithName(new QName("user_id")), request
+						.getFirstChildWithName(new QName("user_firstname")),
+						request
+								.getFirstChildWithName(new QName(
+										"user_lastname")), request
+								.getFirstChildWithName(new QName("user_email")));
+				CHECK_LOGIN = true;
+			} catch (Exception e) {
+				CHECK_LOGIN = false;
+			}
 		}
 		
+		//this will only work if login worked anyway...
 		ToolConfiguration siteTool = SiteService.findTool(toolID);
 		CHECK_SITE = siteTool != null;
 		String siteId = null;
@@ -100,6 +115,7 @@ public class LTILaunch {
 			throw new AxisFault("Could not join site " + siteId);
 		}
 	
+		//we want to make sure everything is ok before proceeding.
 		boolean success = CHECK_DIGEST && CHECK_TIME && CHECK_SITE && CHECK_LOGIN;
 		
 		if (success) {
@@ -258,6 +274,37 @@ public class LTILaunch {
 			return s.getId();
 		}
 		
+	}
+	
+	/**
+	 * this method is basically the same as findSecret from org.sakaiproject.sakaiimsltihelper.tool.impl.ImsLtiHandler, 
+	 * which is part of the IMS LTI Preferences tool inside sakai that sets the secrets and settings for tools. 
+	 * It just grabs the secret from the tool's placement properties file.
+	 * 
+	 * @param toolId The unique ID of the tool whose secret we're looking for.
+	 * @return
+	 */
+	private String findSecret(String toolId) {
+		Site site = null;
+		ToolConfiguration siteTool = SiteService.findTool(toolId);
+		String siteId = null;
+		try {
+			siteId = siteTool.getSiteId();
+			site = SiteService.getSite(siteId);
+		}
+		catch(Exception e) {
+		}
+      
+
+		try {
+			ToolConfiguration tc = site.getTool(toolId);
+			Properties toolconfig = tc.getPlacementConfig();
+			return toolconfig.getProperty(SECRET);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return e.getStackTrace()[0].toString();
+		}
 	}
 
 }

@@ -45,5 +45,6 @@
 	<classpathentry kind="lib" path="/user-api/api/target/sakai-user-api-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/entity-api/api/target/sakai-entity-api-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/event-api/api/target/sakai-event-api-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/authz-api/api/target/sakai-authz-api-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
