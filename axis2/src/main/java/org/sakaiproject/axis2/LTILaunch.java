@@ -24,7 +24,14 @@ import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 
 
-
+/**
+ * Launch Service. A webservice adhering to IMS LTI spec. (see http://simplelti.appspot.com/static/simple_lti_v05.pdf)
+ * for learning tools interoperability. Given a request with the required parameters it will return a response (xml)
+ * containing launchURL & other info.
+ * Point requests at http://yourserver:port/sakai-axis2/LTILaunch/testlaunch?toolID=foo
+ * @author katieedwards
+ *
+ */
 public class LTILaunch {
 	public OMFactory factory = OMAbstractFactory.getOMFactory();
 	private boolean CHECK_TIME = false;
@@ -32,7 +39,7 @@ public class LTILaunch {
 	private boolean CHECK_SITE = false;
 	private boolean CHECK_LOGIN = false;
 	private final static String SECRET = "sakai.ims.lti.secret";
-	private String secret;// = "secret";
+	private String secret;
 	
 	public OMElement testlaunch(OMElement request) throws AxisFault {
 		request.build();
@@ -41,7 +48,7 @@ public class LTILaunch {
 		OMElement launchResponse = factory.createOMElement(new QName("launchResponse"));
 		OMElement status = factory.createOMElement(new QName("status"));
 		
-		
+		/* this parameter can (but doesn't have to) be built into the URL*/
 		OMElement toolID_el = request.getFirstChildWithName(new QName("toolID"));
 		String toolID = toolID_el.getText();
 		//launchResponse.addChild(toolID_el); 
@@ -55,6 +62,8 @@ public class LTILaunch {
 		OMElement digest_el = request.getFirstChildWithName(new QName("sec_digest"));
 		String digest = digest_el.getText();
 		
+		/* get the secret from the tool's placement properties. 
+		 * If the tool has none, secret will be null and we'll get a badPasswordDigest error */
 		try {
 			secret = findSecret(toolID);
 		}catch (Exception e) {
@@ -79,7 +88,7 @@ public class LTILaunch {
 		CHECK_TIME = TimeCalculator.within2Days(created);
 		
 		String sessionId = null;
-		//attempt login if security check passed
+		//attempt user login if security check passed
 		if (CHECK_DIGEST && CHECK_TIME) {
 			try {
 				sessionId = loginCreateSession(request
@@ -119,6 +128,7 @@ public class LTILaunch {
 		boolean success = CHECK_DIGEST && CHECK_TIME && CHECK_SITE && CHECK_LOGIN;
 		
 		if (success) {
+			//build the success response
 			status.setText("success");
 			launchResponse.addChild(status);
 			
@@ -146,17 +156,15 @@ public class LTILaunch {
 			else {
 				type.setText("iFrame");
 				OMElement launchUrl = factory.createOMElement(new QName("launchUrl"));
-				launchUrl.setText("http://www.youtube.com/v/f90ysF9BenI");
+				//launchUrl.setText("http://www.youtube.com/v/f90ysF9BenI");
+				launchUrl.setText("http://localhost:8080/portal/tool/" + toolID + "?sakai.session=" + sessionId);
 				launchResponse.addChild(type);
 				launchResponse.addChild(launchUrl);
 			}
 			
-			//this is just here for now, not sure where to put this data
-			OMElement test_launchURL = factory.createOMElement(new QName("TOOLURL"));
-			test_launchURL.setText("http://localhost:8080/portal/tool/" + toolID + "?sakai.session=" + sessionId);
-			launchResponse.addChild(test_launchURL);
 		}
 		else {
+			//build fail response
 			status.setText("fail");
 			OMElement code = factory.createOMElement(new QName("code"));
 			OMElement description = factory.createOMElement(new QName("description"));
@@ -188,7 +196,14 @@ public class LTILaunch {
 		
 	}
 	
-	
+	/**
+	 * Build the widget part of the XML response.
+	 * This needs to be changed, that youtube link should be changed for a more appropriate URL
+	 * but you get the idea
+	 * @param width_el
+	 * @param height_el
+	 * @return
+	 */
 	private OMElement getWidget(OMElement width_el, OMElement height_el) {
 		width_el.build();
 		width_el.detach();
@@ -215,7 +230,7 @@ public class LTILaunch {
 	
 	
 	/**
-	 * 
+	 * Login the user based on the given parameters. In the case that the user does not exist, create the user.
 	 * @param eid_el
 	 * @param fname_el
 	 * @param lname_el
