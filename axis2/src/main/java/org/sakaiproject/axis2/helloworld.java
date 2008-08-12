@@ -2,6 +2,7 @@ package org.sakaiproject.axis2;
 import org.apache.axiom.om.*;
 import javax.xml.stream.*;
 import org.apache.axis2.AxisFault;
+import javax.xml.namespace.*;
 
 public class helloworld {
 	
@@ -9,23 +10,15 @@ public class helloworld {
 		el.build();
 		el.detach();
 			
-		OMElement child = el.getFirstElement();
+		OMElement child = el.getFirstChildWithName(new QName("name"));
 		String person = child.getText();
 		
-		String rootName = el.getLocalName();
-        System.out.println("Reading "+rootName+" element");
-		
 		OMFactory factory = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = factory.createOMNamespace("www.example.com", "person");
 		
-		OMElement method = factory.createOMElement("sayHello", namespace);
-		OMElement value = factory.createOMElement("greeting", namespace);
+		OMElement reply = factory.createOMElement(new QName("reply"));
+		reply.setText("Hello, " + person);
 		
-		value.addChild( factory.createOMText("Hello, " + person ) );
-		
-		method.addChild( value );
-		
-		return method;
+		return reply;
 	}
 
 }

@@ -6,11 +6,16 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import java.io.UnsupportedEncodingException; 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException; 
 import java.security.MessageDigest;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.namespace.*;
+import org.sakaiproject.authz.api.Role;
+import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.site.api.Site;
@@ -21,6 +26,7 @@ import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.cover.ToolManager;
 
 
@@ -36,8 +42,10 @@ public class LTILaunch {
 	public OMFactory factory = OMAbstractFactory.getOMFactory();
 	private boolean CHECK_TIME = false;
 	private boolean CHECK_DIGEST = false;
+	private boolean CHECK_ORG_DIGEST = false;
 	private boolean CHECK_SITE = false;
 	private boolean CHECK_LOGIN = false;
+	private boolean CHECK_JOINED = false;
 	private final static String SECRET = "sakai.ims.lti.secret";
 	private String secret;
 	
@@ -51,7 +59,6 @@ public class LTILaunch {
 		/* this parameter can (but doesn't have to) be built into the URL*/
 		OMElement toolID_el = request.getFirstChildWithName(new QName("toolID"));
 		String toolID = toolID_el.getText();
-		//launchResponse.addChild(toolID_el); 
 		
 		OMElement nonce_el = request.getFirstChildWithName(new QName("sec_nonce"));
 		String nonce = nonce_el.getText();
@@ -62,6 +69,9 @@ public class LTILaunch {
 		OMElement digest_el = request.getFirstChildWithName(new QName("sec_digest"));
 		String digest = digest_el.getText();
 		
+		OMElement org_digest_el = request.getFirstChildWithName(new QName("sec_org_digest"));
+		String org_digest = org_digest_el.getText();
+		
 		/* get the secret from the tool's placement properties. 
 		 * If the tool has none, secret will be null and we'll get a badPasswordDigest error */
 		try {
@@ -70,34 +80,49 @@ public class LTILaunch {
 			throw new AxisFault("Error validating secret");
 		}
 		
-		String presha1 = nonce + created + secret;
-		String sha1 = null;
 		
+		MessageContext messageContext = MessageContext.getCurrentMessageContext();
+		String ipAddress = (String)messageContext.getProperty("REMOTE_ADDRESS");
+		String hostname = null;
 		try {
-			MessageDigest md;
-			md = MessageDigest.getInstance("SHA-1");
-			byte[] sha1hash = new byte[40];
-			md.update(presha1.getBytes("utf-8"), 0, presha1.length());
-			sha1hash = md.digest();
-			sha1 = new sun.misc.BASE64Encoder().encode(sha1hash);
+			hostname = InetAddress.getByName(ipAddress).getHostName();
+		}catch (UnknownHostException e) {
+			hostname = null;
 		}
-		catch(NoSuchAlgorithmException e) {}
-		catch(UnsupportedEncodingException e) {}
-		
-		CHECK_DIGEST = digest.equals(sha1);
+//		
+//		//check organizational secret
+		if (org_digest != null) {
+			//get host name for organizational password lookup
+			
+		String org_secret = ServerConfigurationService.getString("simplelti.secret." + hostname); /*Just for now*/
+
+			
+			String presha1 = nonce + created + org_secret;
+			
+			CHECK_ORG_DIGEST = securityCheck(presha1, org_digest);
+		}
+		else {
+			//first make sure there isn't a secret saved for that host name!
+			if (ServerConfigurationService.getString("simplelti.secret." + hostname) == null) {
+				CHECK_ORG_DIGEST = true;
+			}
+			else CHECK_ORG_DIGEST = false;
+		}
+
+		//check regular secret
+		String presha1 = nonce + created + secret;
+		CHECK_DIGEST = securityCheck(presha1, digest);
 		CHECK_TIME = TimeCalculator.within2Days(created);
 		
 		String sessionId = null;
+		OMElement eid_el = request.getFirstChildWithName(new QName("user_id"));
+		OMElement fname_el = request.getFirstChildWithName(new QName("user_firstname"));
+		OMElement lname_el = request.getFirstChildWithName(new QName("user_lastname"));
+		OMElement email_el = request.getFirstChildWithName(new QName("user_email"));
 		//attempt user login if security check passed
-		if (CHECK_DIGEST && CHECK_TIME) {
+		if (CHECK_DIGEST && CHECK_ORG_DIGEST && CHECK_TIME) {
 			try {
-				sessionId = loginCreateSession(request
-						.getFirstChildWithName(new QName("user_id")), request
-						.getFirstChildWithName(new QName("user_firstname")),
-						request
-								.getFirstChildWithName(new QName(
-										"user_lastname")), request
-								.getFirstChildWithName(new QName("user_email")));
+				sessionId = loginCreateSession(eid_el, fname_el,lname_el, email_el);
 				CHECK_LOGIN = true;
 			} catch (Exception e) {
 				CHECK_LOGIN = false;
@@ -105,27 +130,62 @@ public class LTILaunch {
 		}
 		
 		//this will only work if login worked anyway...
+		//try to find a site by it's unique id
 		ToolConfiguration siteTool = SiteService.findTool(toolID);
+
+		
 		CHECK_SITE = siteTool != null;
 		String siteId = null;
 		try {
 			siteId = siteTool.getSiteId();
 			CHECK_SITE = true;
-			
 		}
 		catch(Exception e) {
 			CHECK_SITE = false;
 		}
 		
+		/**
+		 * TEST SPACE!
+		 */ 
+		String userrole = request.getFirstChildWithName(new QName("user_role")).getText();
+
 		try {
-			SiteService.join(siteId);
-		}
-		catch(Exception e) {
+			Site thesite = SiteService.getSite(siteId);
+			Set<Role> roles = thesite.getRoles();
+
+			User theuser = UserDirectoryService.getUserByEid(eid_el.getText());
+			if (userrole.equalsIgnoreCase("administrator")) {
+				//requested role is administrator, join as maintain
+				thesite.addMember(theuser.getId(), "maintain", true, true);
+				CHECK_JOINED = true;
+			}
+			else {
+				for (Role r : roles) {
+					//scan available roles and join with requested role if possible
+					if (r.getId().equalsIgnoreCase(userrole)) {
+						thesite.addMember(theuser.getId(), userrole, true, true);
+						CHECK_JOINED = true;
+					}
+				}
+			}
+			//last ditch effort to join the site
+			if (!CHECK_JOINED) 
+				try {
+					SiteService.join(siteId);
+					CHECK_JOINED = true;
+				} catch (Exception e) {
+					CHECK_JOINED = false;
+				}
+		}catch(Exception e) {
 			throw new AxisFault("Could not join site " + siteId);
 		}
+		/**
+		 * TEST SPACE!
+		 */
+
 	
 		//we want to make sure everything is ok before proceeding.
-		boolean success = CHECK_DIGEST && CHECK_TIME && CHECK_SITE && CHECK_LOGIN;
+		boolean success = CHECK_DIGEST  && CHECK_ORG_DIGEST && CHECK_TIME && CHECK_SITE && CHECK_LOGIN && CHECK_JOINED;
 		
 		if (success) {
 			//build the success response
@@ -135,9 +195,9 @@ public class LTILaunch {
 			OMElement launch_targets_el = request.getFirstChildWithName(new QName("launch_targets"));
 			
 			boolean dowidget;
+			String launch_targets = launch_targets_el.getText();
 			
-			if (launch_targets_el != null) {
-				String launch_targets = launch_targets_el.getText();
+			if (launch_targets_el != null) {				
 				dowidget = launch_targets.startsWith("widget");
 			}
 			else {
@@ -154,9 +214,11 @@ public class LTILaunch {
 				launchResponse.addChild(widget);
 			}
 			else {
-				type.setText("iFrame");
+				if (launch_targets.startsWith("post"))
+					type.setText("post");
+				else
+					type.setText("iFrame");		//default
 				OMElement launchUrl = factory.createOMElement(new QName("launchUrl"));
-				//launchUrl.setText("http://www.youtube.com/v/f90ysF9BenI");
 				launchUrl.setText("http://localhost:8080/portal/tool/" + toolID + "?sakai.session=" + sessionId);
 				launchResponse.addChild(type);
 				launchResponse.addChild(launchUrl);
@@ -173,6 +235,10 @@ public class LTILaunch {
 				code.setText("BadPasswordDigest");
 				description.setText("The password digest was invalid");
 			}
+			else if (!CHECK_ORG_DIGEST) {
+				code.setText("BadOrgPasswordDigest");
+				description.setText("Organizational authentication failed"/* + ServerConfigurationService.getString("simplelti.secret." + hostname) + "hostname: " + hostname*/);
+			}
 			else if (!CHECK_TIME) {
 				code.setText("BadRequestTime");
 				description.setText("The request created time was invalid");
@@ -184,6 +250,10 @@ public class LTILaunch {
 			else if (!CHECK_SITE) {
 				code.setText("BadSiteRequest");
 				description.setText("Could not find the requested site.");
+			}
+			else if (!CHECK_JOINED) {
+				code.setText("SiteJoinFail");
+				description.setText("Could not join the requested site.");
 			}
 			
 			launchResponse.addChild(status);
@@ -226,6 +296,29 @@ public class LTILaunch {
 		widget.setText("<object width=\"" + width +"\" height=\""+ height + "\"><param name=\"movie\" value=\"http://www.youtube.com/v/f90ysF9BenI&hl=en\"></param><embed src=\"http://www.youtube.com/v/f90ysF9BenI&hl=en\" type=\"application/x-shockwave-flash\" width=\"" + width + "\" height=\"" + height + "\"></embed></object>");
 		
 		return widget;
+	}
+	
+	/**
+	 * Check the validity of the digest against the string composed of a nonce, date and secret.
+	 * @param presha nonce + created + secret
+	 * @param digest the digest that should match
+	 * @return true if there's a match, false otherwise
+	 */
+	private boolean securityCheck(String presha1, String digest) {
+		String sha1 = null;
+		
+		try {
+			MessageDigest md;
+			md = MessageDigest.getInstance("SHA-1");
+			byte[] sha1hash = new byte[40];
+			md.update(presha1.getBytes("utf-8"), 0, presha1.length());
+			sha1hash = md.digest();
+			sha1 = new sun.misc.BASE64Encoder().encode(sha1hash);
+		}
+		catch(NoSuchAlgorithmException e) {}
+		catch(UnsupportedEncodingException e) {}
+		
+		return digest.equals(sha1);
 	}
 	
 	
@@ -321,5 +414,6 @@ public class LTILaunch {
 			return e.getStackTrace()[0].toString();
 		}
 	}
+	
 
 }

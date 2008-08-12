@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<service name="helloAgainService">
+<service name="testservice">
 	<description>
 	Katie tests hello world with pojos
 	</description>
@@ -9,11 +9,8 @@
 		org.sakaiproject.axis2.helloagain
 	</parameter>
 	
-	<messageReceivers>
-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
-                         class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
-                         class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
-    </messageReceivers>
+	<operation name="test">
+		<messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+	</operation>
 	
 </service>
