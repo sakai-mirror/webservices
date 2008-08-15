@@ -49,7 +49,7 @@ public class LTILaunch {
 	private final static String SECRET = "sakai.ims.lti.secret";
 	private String secret;
 	
-	public OMElement testlaunch(OMElement request) throws AxisFault {
+	public OMElement launch(OMElement request) throws AxisFault {
 		request.build();
 		request.detach();
 		
@@ -144,9 +144,7 @@ public class LTILaunch {
 			CHECK_SITE = false;
 		}
 		
-		/**
-		 * TEST SPACE!
-		 */ 
+
 		String userrole = request.getFirstChildWithName(new QName("user_role")).getText();
 
 		try {
@@ -154,7 +152,7 @@ public class LTILaunch {
 			Set<Role> roles = thesite.getRoles();
 
 			User theuser = UserDirectoryService.getUserByEid(eid_el.getText());
-			if (userrole.equalsIgnoreCase("administrator")) {
+			if (userrole.equalsIgnoreCase("administrator") || userrole.equalsIgnoreCase("maintain")) {
 				//requested role is administrator, join as maintain
 				thesite.addMember(theuser.getId(), "maintain", true, true);
 				CHECK_JOINED = true;
@@ -163,8 +161,13 @@ public class LTILaunch {
 				for (Role r : roles) {
 					//scan available roles and join with requested role if possible
 					if (r.getId().equalsIgnoreCase(userrole)) {
-						thesite.addMember(theuser.getId(), userrole, true, true);
-						CHECK_JOINED = true;
+						try {
+							thesite.addMember(theuser.getId(), userrole, true, true);
+							CHECK_JOINED = true;
+						}catch(Exception e) {
+							CHECK_JOINED = false;
+						}
+						
 					}
 				}
 			}
@@ -179,11 +182,7 @@ public class LTILaunch {
 		}catch(Exception e) {
 			throw new AxisFault("Could not join site " + siteId);
 		}
-		/**
-		 * TEST SPACE!
-		 */
 
-	
 		//we want to make sure everything is ok before proceeding.
 		boolean success = CHECK_DIGEST  && CHECK_ORG_DIGEST && CHECK_TIME && CHECK_SITE && CHECK_LOGIN && CHECK_JOINED;
 		

@@ -9,7 +9,7 @@
 		org.sakaiproject.axis2.LTILaunch
 	</parameter>
 	
-	<operation name="testlaunch">
+	<operation name="launch">
 
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
 
