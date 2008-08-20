@@ -4,6 +4,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Helper class for the LTILaunch.java web service. Helps out with checking validity of date strings.
+ * @author katieedwards
+ *
+ */
 public class TimeCalculator {
 	
 	public static SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-ddHH:mm:ssZ");

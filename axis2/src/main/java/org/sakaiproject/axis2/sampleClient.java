@@ -7,10 +7,14 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axiom.om.*;
 import javax.xml.stream.*;
 
-
+/**
+ * A sample client you can run to test out the "MyService" webservice included in this package.
+ * @author katieedwards
+ *
+ */
 public class sampleClient {
 	
-	private static String toEpr = "http://localhost:8080/sakai-axis2/services/MyService/echo";
+	private static String toEpr = "http://localhost:8080/sakai-axis2/services/MyService/sayhi";
 	
 	public static void main(String[] args) throws AxisFault {
 		
@@ -36,7 +40,7 @@ public class sampleClient {
 		OMFactory factory = OMAbstractFactory.getOMFactory();
 		OMNamespace ns = factory.createOMNamespace("www.EXAMPLE.com", "PERSON");
 		
-		OMElement method = factory.createOMElement("sayHello", ns);
+		OMElement method = factory.createOMElement("sayhi", ns);
 		OMElement value = factory.createOMElement("name", ns);
 		
 		value.addChild(factory.createOMText(value, name));

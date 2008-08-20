@@ -218,7 +218,7 @@ public class LTILaunch {
 				else
 					type.setText("iFrame");		//default
 				OMElement launchUrl = factory.createOMElement(new QName("launchUrl"));
-				launchUrl.setText("http://localhost:8080/portal/tool/" + toolID + "?sakai.session=" + sessionId);
+				launchUrl.setText(ServerConfigurationService.getServerUrl() + "/portal/tool/" + toolID + "?sakai.session=" + sessionId);
 				launchResponse.addChild(type);
 				launchResponse.addChild(launchUrl);
 			}
@@ -292,7 +292,7 @@ public class LTILaunch {
 		else
 			height = "344";
 		
-		widget.setText("<object width=\"" + width +"\" height=\""+ height + "\"><param name=\"movie\" value=\"http://www.youtube.com/v/f90ysF9BenI&hl=en\"></param><embed src=\"http://www.youtube.com/v/f90ysF9BenI&hl=en\" type=\"application/x-shockwave-flash\" width=\"" + width + "\" height=\"" + height + "\"></embed></object>");
+		widget.setText("<object width=\"" + width +"\" height=\""+ height + "\"><param name=\"launchUrl\" value=\"" + ServerConfigurationService.getServerUrl() + toolID + "/portal/tool/" + "?sakai.session=" + sessionId + "\"" + " type=\"text/html\" width=\"" + width + "\" height=\"" + height + "\"></embed></object>");
 		
 		return widget;
 	}

@@ -1,3 +1,5 @@
+Please see an updated pdf document for a detailed tutorial on how to write web services with axis2 in Sakai.
+
 WRITING A NEW WEBSERVICE:
 
 1) Write the service class. Public methods will be exposed as operations in the service.
