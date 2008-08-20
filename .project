@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>webservices</name>
+	<name>SAK-13392-B</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>README.pdf</name>
+			<type>1</type>
+			<location>/Users/katieedwards/Desktop/Axis2-writeup.pdf</location>
+		</link>
+	</linkedResources>
 </projectDescription>

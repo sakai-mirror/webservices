@@ -20,7 +20,7 @@
   
 
   <modules>
-    <module>axis</module>
+    <module>simpleLTI</module>
     <module>axis2</module>
   </modules>
 </project>

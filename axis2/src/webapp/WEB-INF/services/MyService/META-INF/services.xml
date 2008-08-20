@@ -9,7 +9,7 @@
 		org.sakaiproject.axis2.MyService
 	</parameter>
 	
-	<operation name="echo">
+	<operation name="sayhi">
 		<messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
 	</operation>
 

@@ -8,7 +8,7 @@ import org.apache.axiom.om.OMFactory;
 
 public class MyService {
 	
-	public OMElement echo(OMElement el) throws XMLStreamException {
+	public OMElement sayhi(OMElement el) throws XMLStreamException {
 		el.build();
 		el.detach();
 			
