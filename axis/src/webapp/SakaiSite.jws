@@ -26,6 +26,7 @@ import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.apache.axis.AxisFault;
 
 import org.sakaiproject.javax.PagingPosition;
+import org.sakaiproject.exception.IdUnusedException;
 
 /**
  * class to support Sakai Login headers sent in request as a string array
@@ -164,24 +165,7 @@ public class SakaiSite {
 	        Node siteNode = dom.createElement("site");
 		allSites.appendChild(siteNode);
 
-		Node titleNode = dom.createElement("title");
-		siteNode.appendChild(titleNode);
-		titleNode.appendChild(dom.createTextNode(theSite.getTitle()));
-
-		Node idNode  = dom.createElement("id");
-		siteNode.appendChild(idNode);
-		idNode.appendChild(dom.createTextNode(theSite.getId()));
-
-		Node urlNode  = dom.createElement("url");
-		siteNode.appendChild(urlNode);
-		urlNode.appendChild(dom.createTextNode(serverUrl+"/portal/worksite/"+theSite.getId()));
-
-		Node typeNode  = dom.createElement("type");
-		siteNode.appendChild(typeNode);
-		typeNode.appendChild(dom.createTextNode(theSite.getType()));
- 
-		// Load up the pages
-		if ( doTools) scanPages(dom, theSite, siteNode, serverUrl);
+             fillSiteNode(siteNode, theSite, serverUrl, doTools);
         }
 
 	String retVal = Xml.writeDocumentToString(dom);
@@ -189,7 +173,29 @@ public class SakaiSite {
         return retVal;
     }
 
-    private void scanPages(Document dom, Site theSite, Node siteNode, String serverUrl)
+   private void fillSiteNode(Node siteNode, Site theSite, String serverUrl, boolean doTools) {
+      Document dom = siteNode.getOwnerDocument();
+      Node titleNode = dom.createElement("title");
+      siteNode.appendChild(titleNode);
+      titleNode.appendChild(dom.createTextNode(theSite.getTitle()));
+
+      Node idNode  = dom.createElement("id");
+      siteNode.appendChild(idNode);
+      idNode.appendChild(dom.createTextNode(theSite.getId()));
+
+      Node urlNode  = dom.createElement("url");
+      siteNode.appendChild(urlNode);
+      urlNode.appendChild(dom.createTextNode(serverUrl+"/portal/worksite/"+theSite.getId()));
+
+      Node typeNode  = dom.createElement("type");
+      siteNode.appendChild(typeNode);
+      typeNode.appendChild(dom.createTextNode(theSite.getType()));
+
+      // Load up the pages
+      if ( doTools) scanPages(dom, theSite, siteNode, serverUrl);
+   }
+
+   private void scanPages(Document dom, Site theSite, Node siteNode, String serverUrl)
     {
 		// Node toolsNode = dom.createElement("tools");
 		// siteNode.appendChild(toolsNode);
@@ -256,4 +262,25 @@ public class SakaiSite {
 
     }
 
+   
+   public String getSiteType(String sessionId, String siteId) throws AxisFault {
+      establishSession(sessionId);
+      Document dom = Xml.createDocument();
+      Node siteNode = dom.createElement("site");
+      dom.appendChild(siteNode);
+      String serverUrl = ServerConfigurationService.getServerUrl();
+      Site theSite;
+      
+      try {
+         theSite = SiteService.getSite(siteId);
+      } 
+      catch (IdUnusedException e) {
+         throw new AxisFault("failed to find site", e);
+      }
+
+      fillSiteNode(siteNode, theSite, serverUrl, false);
+      
+      String retVal = Xml.writeDocumentToString(dom);
+      return retVal;
+   }
 }
