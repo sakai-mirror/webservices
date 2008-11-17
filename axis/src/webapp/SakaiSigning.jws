@@ -182,7 +182,10 @@ public class SakaiSigning {
     String sessionid = null;
     String userref = null;
     
-    s = makesession(object, "internaluser=");
+	if (object.equals("currentuser") && data != null)
+	   s = makesession(data, "internaluser=");
+	else 
+	   s = makesession(object, "user=");
 
 	if (s != null) {
 		sessionid = s.getId();
