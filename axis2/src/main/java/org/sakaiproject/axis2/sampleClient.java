@@ -30,7 +30,7 @@ import javax.xml.stream.*;
  */
 public class sampleClient {
 	
-	private static String toEpr = "http://localhost:8080/sakai-axis2/services/MyService/sayhi";
+	private static String toEpr = "http://127.0.0.1:8080/sakai-axis2/services/MyService/sayhi";
 	
 	public static void main(String[] args) throws AxisFault {
 		

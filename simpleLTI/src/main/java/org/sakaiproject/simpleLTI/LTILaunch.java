@@ -224,7 +224,7 @@ public class LTILaunch {
 			if (dowidget) {
 				type.setText("widget");
 				OMElement widget = getWidget(request.getFirstChildWithName(new QName("launch_width")), 
-						request.getFirstChildWithName(new QName("launch_height")));
+						request.getFirstChildWithName(new QName("launch_height")), toolID, sessionId);
 				launchResponse.addChild(type);
 				launchResponse.addChild(widget);
 			}
@@ -289,7 +289,7 @@ public class LTILaunch {
 	 * @param height_el
 	 * @return
 	 */
-	private OMElement getWidget(OMElement width_el, OMElement height_el) {
+	private OMElement getWidget(OMElement width_el, OMElement height_el, String toolID, String sessionId) {
 		width_el.build();
 		width_el.detach();
 		height_el.build();
