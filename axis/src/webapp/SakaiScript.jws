@@ -1,5 +1,5 @@
 /*
- *   SakaiScript.jws - updated for Sakai 2.1
+ *   SakaiScript.jws - updated for Sakai 2.5
  *
  */
  
@@ -67,6 +67,22 @@ public String checkSession(String id) {
 	}
 }
 
+/**
+ * Create a new user account
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the new user
+ * @param	firstname		the new user's first name
+ * @param	lastname		the new user's last name
+ * @param	email			the new user's email address
+ * @param	type			the type of account (ie registered, guest etc). Should either match one of the !user.template.XXX realms (where XXX is the type) or be blank to inherit the !user.template permission
+ * @param	password		the password for the new user
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ * This is the preferred method of adding user accounts whereby their internal ID is automatically assigned a UUID.
+ *
+ */
 public String addNewUser( String sessionid, String eid, String firstname, String lastname, String email, String type, String password) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -83,11 +99,29 @@ public String addNewUser( String sessionid, String eid, String firstname, String
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.warn("WS addNewUser(): " + e.getClass().getName() + " : " + e.getMessage());
+        return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Create a new user account
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	id				the id of the new user that will be used internally by Sakai
+ * @param	eid				the login username (ie jsmith26) of the new user
+ * @param	firstname		the new user's first name
+ * @param	lastname		the new user's last name
+ * @param	email			the new user's email address
+ * @param	type			the type of account (ie registered, guest etc). Should either match one of the !user.template.XXX realms (where XXX is the type) or be blank to inherit the !user.template permission
+ * @param	password		the password for the new user
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ * 
+ * This form of addUser() should only be used when you need control over the user's internal ID. Otherwise use the other form.
+ * 
+ */
 public String addNewUser( String sessionid, String id ,String eid, String firstname, String lastname, String email, String type, String password) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -104,11 +138,21 @@ public String addNewUser( String sessionid, String id ,String eid, String firstn
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.warn("WS addNewUser(): " + e.getClass().getName() + " : " + e.getMessage());
+        return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Remove a user account
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the user whose account you want to remove
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ */
 public String removeUser( String sessionid, String eid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -122,11 +166,28 @@ public String removeUser( String sessionid, String eid) throws AxisFault
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeUser(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Edit a user's account details
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the user you want to edit
+ * @param	firstname		the updated firstname for the user
+ * @param	lastname		the updated last name for the user
+ * @param	email			the updated email address for the user
+ * @param	type			the updated user type
+ * @param	password		the updated password for the user
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ * Note that if you only want to change individual properties of a user's account like their email address or password, see the related web services.
+ *
+ */
 public String changeUserInfo( String sessionid, String eid, String firstname, String lastname, String email, String type, String password) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -144,12 +205,24 @@ public String changeUserInfo( String sessionid, String eid, String firstname, St
 		UserDirectoryService.commitEdit(userEdit);
 	
 	}
-	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+	catch (Exception e) { 
+		LOG.error("WS removeUser(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Edit a user's firstname/lastname
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the user you want to edit
+ * @param	firstname		the updated firstname for the user
+ * @param	lastname		the updated last name for the user
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ */
 public String changeUserName( String sessionid, String eid, String firstname, String lastname) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -162,14 +235,24 @@ public String changeUserName( String sessionid, String eid, String firstname, St
 		userEdit.setFirstName(firstname);
 		userEdit.setLastName(lastname);
 		UserDirectoryService.commitEdit(userEdit);
-	
 	}
-	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+	catch (Exception e) { 
+		LOG.error("WS changeUserName(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Edit a user's email address
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the user you want to edit
+ * @param	email			the updated email address for the user
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ */
 public String changeUserEmail( String sessionid, String eid, String email) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -183,12 +266,23 @@ public String changeUserEmail( String sessionid, String eid, String email) throw
 		UserDirectoryService.commitEdit(userEdit);
 	
 	}
-	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+	catch (Exception e) { 
+		LOG.error("WS changeUserEmail(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Edit a user's user type
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the user you want to edit
+ * @param	type			the updated user type. See addNewUser() for an explanation of what this field means
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ */
 public String changeUserType( String sessionid, String eid, String type) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -201,12 +295,23 @@ public String changeUserType( String sessionid, String eid, String type) throws 
 		UserDirectoryService.commitEdit(userEdit);
 	
 	}
-	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+	catch (Exception e) { 
+		LOG.error("WS changeUserType(): " + e.getClass().getName() + " : " + e.getMessage());
+		return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Edit a user's password
+ *
+ * @param	sessionid		the id of a valid session
+ * @param	eid				the login username (ie jsmith26) of the user you want to edit
+ * @param	password		the password for the user
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ */
 public String changeUserPassword( String sessionid, String eid, String password) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -220,12 +325,21 @@ public String changeUserPassword( String sessionid, String eid, String password)
 		UserDirectoryService.commitEdit(userEdit);
 	
 	}
-	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+	catch (Exception e) {
+		LOG.error("WS changeUserPassword(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Get a user's email address based on their session id
+ *
+ * @param	sessionid		the session id of the user who's email address you wish to retrieve
+ * @return		        	their email address
+ * @throws	AxisFault
+ *
+ */
 public String getUserEmail( String sessionid ) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -233,6 +347,14 @@ public String getUserEmail( String sessionid ) throws AxisFault
 	return user.getEmail();
 }
 
+/**
+ * Get a user's display name based on their session id
+ *
+ * @param	sessionid		the session id of the user who's display name you wish to retrieve
+ * @return		        	success or exception message
+ * @throws	AxisFault
+ *
+ */
 public String getUserDisplayName( String sessionid ) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -270,12 +392,22 @@ public String removeAuthzGroup( String sessionid, String authzgroupid) throws Ax
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeAuthzGroup(): " + e.getClass().getName() + " : " + e.getMessage());
+		return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//addNewRoleToRealm
+/**
+ * Add a role to an authzgroup (realm)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup to add the role to
+ * @param 	roleid		 	the id of the role to add
+ * @param 	description 	the description for the new role
+ * @return					success or exception message
+ *
+ */
 public String addNewRoleToAuthzGroup( String sessionid, String authzgroupid, String roleid, String description) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -289,13 +421,21 @@ public String addNewRoleToAuthzGroup( String sessionid, String authzgroupid, Str
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS addNewRoleToAuthzGroup(): " + e.getClass().getName() + " : " + e.getMessage());
+		return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//removeAllRolesFromRealm
-public String removeAllRolesFromAuthzGroup( String sessionid, String authzgroupid) throws AxisFault
+/**
+ * Remove all roles that exist in an authzgroup (realm)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup to remove the roles from
+ * @return					success or exception message
+ *
+ */
+ public String removeAllRolesFromAuthzGroup( String sessionid, String authzgroupid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
 	
@@ -307,12 +447,21 @@ public String removeAllRolesFromAuthzGroup( String sessionid, String authzgroupi
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeAllRolesFromAuthzGroup(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//removeRolefromRealm
+/**
+ * Remove a role from an authzgroup (realm)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup to remove the role from
+ * @param 	roleid		 	the id of the role to remove
+ * @return					success or exception message
+ *
+ */
 public String removeRoleFromAuthzGroup( String sessionid, String authzgroupid, String roleid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -325,12 +474,23 @@ public String removeRoleFromAuthzGroup( String sessionid, String authzgroupid, S
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeRoleFromAuthzGroup(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//addLockToRole
+/**
+ * Add a function to a role in an authzgroup (realm)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup that the role is in
+ * @param 	roleid		 	the id of the role to add a function to
+ * @param	functionname	the name of the new function eg content.new
+ * @return					success or exception message
+ *
+ * TODO: fix for if the functionname doesn't exist, it is still returning success - SAK-15334
+ */
 public String allowFunctionForRole( String sessionid, String authzgroupid, String roleid, String function) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -344,12 +504,21 @@ public String allowFunctionForRole( String sessionid, String authzgroupid, Strin
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS allowFunctionForRole(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//removeAllLocksFromRole
+/**
+ * Remove all functions from a role in an authzgroup (realm)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup that the role is in
+ * @param 	roleid		 	the id of the role to remove the functions from
+ * @return					success or exception message
+ *
+ */
 public String disallowAllFunctionsForRole( String sessionid, String authzgroupid, String roleid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -363,12 +532,23 @@ public String disallowAllFunctionsForRole( String sessionid, String authzgroupid
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS disallowAllFunctionsForRole(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//removeLockFromRole
+/**
+ * Remove a function from a role in an authzgroup (realm)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup that the role is in
+ * @param 	roleid		 	the id of the role to remove the function from
+ * @param	functionname	the name of the function to remove
+ * @return					success or exception message
+ *
+ * TODO: fix for if the functionname doesn't exist, it is still returning success - SAK-15334
+ */
 public String disallowFunctionForRole( String sessionid, String authzgroupid, String roleid, String function) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -382,11 +562,22 @@ public String disallowFunctionForRole( String sessionid, String authzgroupid, St
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS disallowFunctionForRole(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Edit a role's description
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup that the role exists in
+ * @param 	roleid		 	the id of the role to edit
+ * @param 	description 	the updated description for the role
+ * @return					success or exception message
+ *
+ */
 public String setRoleDescription( String sessionid, String authzgroupid, String roleid, String description) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -400,12 +591,22 @@ public String setRoleDescription( String sessionid, String authzgroupid, String 
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS setRoleDescription(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//addUserToRealmWithRole
+/**
+ * Add a user to an authgroup with the given role
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	eid	 			the login username (ie jsmith26) of the user you want to add
+ * @param 	authzgroupid 	the id of the authzgroup to add the user to
+ * @param 	roleid		 	the id of the role to add the user to in the authzgroup
+ * @return					success or exception message
+ *
+ */
 public String addMemberToAuthzGroupWithRole( String sessionid, String eid, String authzgroupid, String roleid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -419,13 +620,22 @@ public String addMemberToAuthzGroupWithRole( String sessionid, String eid, Strin
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS addMemberToAuthzGroupWithRole(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//removeUserFromRealm
-public String removeMemberFromAuthzGroup( String sessionid, String eid, String authzgroupid) throws AxisFault
+/**
+ * Remove a user from an authgroup
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	eid	 			the login username (ie jsmith26) of the user you want to remove
+ * @param 	authzgroupid 	the id of the authzgroup to remove the user from
+ * @return					success or exception message
+ *
+ */
+ public String removeMemberFromAuthzGroup( String sessionid, String eid, String authzgroupid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
 	
@@ -438,13 +648,21 @@ public String removeMemberFromAuthzGroup( String sessionid, String eid, String a
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeMemberFromAuthzGroup(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//removeAllUsersFromRealm
-public String removeAllMembersFromAuthzGroup( String sessionid, String authzgroupid) throws AxisFault
+/**
+ * Remove all users from an authgroup
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup to remove the users from
+ * @return					success or exception message
+ *
+ */
+ public String removeAllMembersFromAuthzGroup( String sessionid, String authzgroupid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
 	
@@ -456,13 +674,23 @@ public String removeAllMembersFromAuthzGroup( String sessionid, String authzgrou
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeAllMembersFromAuthzGroup(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//setRoleForRealmMaintenance
-public String setRoleForAuthzGroupMaintenance( String sessionid, String authzgroupid, String roleid) throws AxisFault
+/**
+ * Set the role that allows maintenance on the given authgroup
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	authzgroupid 	the id of the authzgroup to edit
+ * @param 	roleid		 	the id of the role to to set
+ * @return					success or exception message
+ *
+ * TODO: fix for if the role doesn't exist in the authzgroup, it is still returning success - SAK-15334
+ */
+ public String setRoleForAuthzGroupMaintenance( String sessionid, String authzgroupid, String roleid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
 	
@@ -474,11 +702,23 @@ public String setRoleForAuthzGroupMaintenance( String sessionid, String authzgro
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS setRoleForAuthzGroupMaintenance(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Add a user to a site with a given role
+ *
+ * @param 	sessionid 	the id of a valid session
+ * @param 	siteid 		the id of the site to add the user to
+ * @param 	eid		 	the login username (ie jsmith26) of the user you want to add to the site
+ * @param 	roleid		the id of the role to to give the user in the site
+ * @return				success or exception message
+ *
+ * TODO: fix for if the role doesn't exist in the site, it is still returning success - SAK-15334
+ */
 public String addMemberToSiteWithRole(String sessionid, String siteid, String eid, String roleid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -489,12 +729,34 @@ public String addMemberToSiteWithRole(String sessionid, String siteid, String ei
 		site.addMember(userid,roleid,true,false);
 		SiteService.save(site);
 	}
-	catch (Exception e) {
-		return e.getClass().getName() + " : " + e.getMessage();
+	catch (Exception e) {  
+		LOG.error("WS addMemberToSiteWithRole(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Create a new site
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the new site (ie test123)
+ * @param 	title 			the title of the new site
+ * @param 	description 	the full description for the new site
+ * @param 	shortdesc 		the short description for the new site
+ * @param 	iconurl 		the url to an icon for the site (on the default skin should not be more than 100px wide)
+ * @param 	infourl 		the url to a page of information about the site (this is added to the Site Information portlet)
+ * @param 	joinable 		should this site be joinable?
+ * @param 	joinerrole 		if joinable, the role to assign users that join this site
+ * @param 	published 		should this site be made available to participants of the site now? 
+ * @param 	publicview 		should this site be shown on the public list of sites?
+ * @param 	skin 			the id of the skin for this site, from the list in /library/skin/SKIN
+ * @param 	type 			the type of site ie project, course, etc, or any type defined as !site.template.TYPE. If blank will inherit !site.template roles/permissions
+ * @return					success or exception message
+ *
+ * Note that this will create an empty site with no tools. If you would like to create a site from a template, ie inherit its tool structure (not content), see copySite()
+ *
+ */
 public String addNewSite( String sessionid, String siteid, String title, String description, String shortdesc, String iconurl, String infourl, boolean joinable, String joinerrole, boolean published, boolean publicview, String skin, String type) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -518,12 +780,20 @@ public String addNewSite( String sessionid, String siteid, String title, String 
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS addNewSite(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-
+/**
+ * Remove a site
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the site to remove
+ * @return					success or exception message
+ *
+ */
 public String removeSite( String sessionid, String siteid) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -536,11 +806,32 @@ public String removeSite( String sessionid, String siteid) throws AxisFault
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removeSite(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Create a new site based on another site. This will copy its tool structure, but not its content
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteidtocopy	the id of the site to base this new site on
+ * @param 	siteid 			the id of the new site (ie test123)
+ * @param 	title 			the title of the new site
+ * @param 	description 	the full description for the new site
+ * @param 	shortdesc 		the short description for the new site
+ * @param 	iconurl 		the url to an icon for the site (on the default skin should not be more than 100px wide)
+ * @param 	infourl 		the url to a page of information about the site (this is added to the Site Information portlet)
+ * @param 	joinable 		should this site be joinable?
+ * @param 	joinerrole 		if joinable, the role to assign users that join this site
+ * @param 	published 		should this site be made available to participants of the site now? 
+ * @param 	publicview 		should this site be shown on the public list of sites?
+ * @param 	skin 			the id of the skin for this site, from the list in /library/skin/SKIN
+ * @param 	type 			the type of site ie project, course, etc, or any type defined as !site.template.TYPE. If blank will inherit !site.template roles/permissions
+ * @return					success or exception message
+ *
+ */
 public String copySite( String sessionid, String siteidtocopy, String newsiteid, String title, String description, String shortdesc, String iconurl, String infourl, boolean joinable, String joinerrole, boolean published, boolean publicview, String skin, String type) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -564,11 +855,22 @@ public String copySite( String sessionid, String siteidtocopy, String newsiteid,
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS copySite(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Create a new page in a site. A page holds one or more tools and is shown in the main navigation section. You will still need to add tools to this page.
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the site to add the page to
+ * @param 	pagetitle 		the title of the new page
+ * @param 	pagelayout 		single or double column (0 or 1). Any other value will revert to 0.
+ * @return					success or exception message
+ *
+ */
 public String addNewPageToSite( String sessionid, String siteid, String pagetitle, int pagelayout) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -585,11 +887,23 @@ public String addNewPageToSite( String sessionid, String siteid, String pagetitl
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS addNewPageToSite(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
+/**
+ * Remove a page from a site
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the site to remove the page from
+ * @param 	pagetitle 		the title of the page to remove
+ * @return					success or exception message
+ *
+ * TODO: fix for if the page title is blank it removes nothing and is still returning success - SAK-15334
+ * TODO: fix for ConcurrentModficationException being thrown - SAK-15337. Is this because it removes via pagetitle but can allow multiple page titles of the same name?
+ */
 public String removePageFromSite( String sessionid, String siteid, String pagetitle) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -609,13 +923,26 @@ public String removePageFromSite( String sessionid, String siteid, String pageti
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS removePageFromSite(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
 
-
+/**
+ * Add a new tool to a page in a site
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the site to add the page to
+ * @param 	pagetitle 		the title of the page to add the tool to
+ * @param 	tooltitle 		the title of the new tool (ie Resources)
+ * @param 	toolid 			the id of the new tool (ie sakai.resources)
+ * @param 	layouthints 	where on the page this tool should be added, in 'row, col' and 0 based, ie first column, first tool='0,0'; Second column third tool = '1,2'
+ * @return					success or exception message
+ *
+ * TODO: fix for if any values (except sessionid and siteid) are blank or invalid, it is still returning success - SAK-15334
+ */
 public String addNewToolToPage( String sessionid, String siteid, String pagetitle, String tooltitle, String toolid, String layouthints) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -636,20 +963,33 @@ public String addNewToolToPage( String sessionid, String siteid, String pagetitl
 				tool.setTitle(tooltitle);
 				//toolEdit.setTitle(tooltitle);
 				//toolEdit.setToolId(toolid);
-				//toolEdit.setLayoutHints(layouthints);
+				//tool.setLayoutHints(layouthints);
 			}
 		}
 		SiteService.save(siteEdit);
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS addNewToolToPage(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
 
-
+/**
+ * Add a property to a tool on a page in a site
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the site to add the page to
+ * @param 	pagetitle 		the title of the page the tool exists in
+ * @param 	tooltitle 		the title of the tool to add the property to
+ * @param 	propname 		the name of the property
+ * @param 	propvalue 		the value of the property
+ * @return					success or exception message
+ *
+ * TODO: fix for if any values (except sessionid and siteid) are blank or invalid, it is still returning success - SAK-15334
+ */
 public String addConfigPropertyToTool( String sessionid, String siteid, String pagetitle, String tooltitle, String propname, String propvalue) throws AxisFault
 {
 	Session session = establishSession(sessionid);
@@ -680,12 +1020,20 @@ public String addConfigPropertyToTool( String sessionid, String siteid, String p
 	
 	}
 	catch (Exception e) {  
-	 return e.getClass().getName() + " : " + e.getMessage();
+		LOG.error("WS addConfigPropertyToTool(): " + e.getClass().getName() + " : " + e.getMessage());
+	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
 	return "success";
 }
 
-//checkForUser(): a call to check for an existing user
+/**
+ * Check if a user exists (either as an account in Sakai or in any external provider)
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	eid 			the login username (ie jsmith26) of the user to check for
+ * @return					true/false
+ *
+ */
 public boolean checkForUser(String sessionid, String eid) throws AxisFault
 {
 	Session s = establishSession(sessionid);
@@ -694,37 +1042,55 @@ public boolean checkForUser(String sessionid, String eid) throws AxisFault
 		User u = null;
 		String userid = UserDirectoryService.getUserByEid(eid).getId();
 		u = UserDirectoryService.getUser(userid);
-		if (u != null)
+		if (u != null) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
-	catch (Exception e)
-	{
+	catch (Exception e) {
+		LOG.error("WS checkForUser(): " + e.getClass().getName() + " : " + e.getMessage());
 		return false;
 	}
 }
 
-// checkForSite(): a call to check for an existing site
-public boolean checkForSite(String sessionid, String siteid) throws AxisFault
+/**
+ * Check if a site exists
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	siteid 			the id of the site to check for
+ * @return					true/false
+ *
+ */
+ public boolean checkForSite(String sessionid, String siteid) throws AxisFault
 {
 	Session s = establishSession(sessionid);
 	
 	try {
 		Site site = null;
 		site = SiteService.getSite(siteid);
-		if (site != null)
+		if (site != null) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
-	catch (Exception e)
-	{
+	catch (Exception e) {
+		LOG.error("WS checkForSite(): " + e.getClass().getName() + " : " + e.getMessage());
 		return false;
 	}
 }
 
-//checkForUserInRealmWithRole
+/**
+ * Check if a user exists in the authzgroup (or site) with the given role
+ *
+ * @param 	sessionid 		the id of a valid session
+ * @param 	eid 			the login username (ie jsmith26) of the user to check for
+ * @param 	authzgroupid 	the id of the authzgroup to check in. If this is a site it should be of the form /site/SITEID
+ * @param 	role 			the id of the role for the user in the site
+ * @return					true/false
+ *
+ */
 public boolean checkForMemberInAuthzGroupWithRole(String sessionid, String eid, String authzgroupid, String role) throws AxisFault
 {
 	Session s = establishSession(sessionid);
@@ -732,21 +1098,40 @@ public boolean checkForMemberInAuthzGroupWithRole(String sessionid, String eid, 
 	try {
 		AuthzGroup authzgroup = null; 
 		authzgroup = AuthzGroupService.getAuthzGroup(authzgroupid);
-		if (authzgroup == null)
+		if (authzgroup == null) {
 			return false;
-		else {
+		} else {
 			String userid = UserDirectoryService.getUserByEid(eid).getId();
 			return authzgroup.hasRole(userid, role);
 		}
 	}
 	catch (Exception e) {
+		LOG.error("WS checkForMemberInAuthzGroupWithRole(): " + e.getClass().getName() + " : " + e.getMessage());
 		return false;
 	}
 }
 
-// Return XML document listing all sites user has read or write access
-public String getSitesUserCanAccess(String sessionid)
-	throws AxisFault
+/**
+ * Return XML document listing all sites user has read or write access based on their session id.
+ *
+ * @param 	sessionid 		the session id of a user who's list of sites you want to retrieve
+ * @param 	eid 			the login username (ie jsmith26) of the user to check for
+ * @param 	authzgroupid 	the id of the authzgroup to check in. If this is a site it should be of the form /site/SITEID
+ * @param 	role 			the id of the role for the user in the site
+ * @return					xml or an empty list <list/>. The return XML format is below:
+ *<list>
+ *	<item>
+ *		<siteId>!admin</siteId>
+ *		<siteTitle>Administration Workspace</siteTitle>
+ *	</item>
+ *	<item>
+ *		...
+ *	</item>
+ *	...
+ *</list>
+ *
+ */
+public String getSitesUserCanAccess(String sessionid) throws AxisFault
 {
 	Session s = establishSession(sessionid);
 	
@@ -757,9 +1142,9 @@ public String getSitesUserCanAccess(String sessionid)
 		List moreSites = SiteService.getSites(SelectionType.UPDATE, null, null,
 															null, SortType.TITLE_ASC, null);
 		
-		if ( (allSites == null || moreSites == null) ||
-			  (allSites.size() == 0 && moreSites.size() == 0) )
+		if ((allSites == null || moreSites == null) || (allSites.size() == 0 && moreSites.size() == 0)) {
 			return "<list/>";
+		}
 
 		// combine two lists
 		allSites.addAll( moreSites );
@@ -786,8 +1171,11 @@ public String getSitesUserCanAccess(String sessionid)
 	}
 	catch (Exception e) 
 	{
+		LOG.error("WS getSitesUserCanAccess(): " + e.getClass().getName() + " : " + e.getMessage());
 		return "<exception/>";
 	}
 }
+
+
 
 }
