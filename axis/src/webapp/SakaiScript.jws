@@ -491,7 +491,7 @@ public String removeRoleFromAuthzGroup( String sessionid, String authzgroupid, S
  *
  * TODO: fix for if the functionname doesn't exist, it is still returning success - SAK-15334
  */
-public String allowFunctionForRole( String sessionid, String authzgroupid, String roleid, String function) throws AxisFault
+public String allowFunctionForRole( String sessionid, String authzgroupid, String roleid, String functionname) throws AxisFault
 {
 	Session session = establishSession(sessionid);
 	
@@ -499,7 +499,7 @@ public String allowFunctionForRole( String sessionid, String authzgroupid, Strin
 
 		AuthzGroup authzgroup = AuthzGroupService.getAuthzGroup(authzgroupid);
 		Role role = authzgroup.getRole(roleid);
-		role.allowFunction(function);
+		role.allowFunction(functionname);
 		AuthzGroupService.save(authzgroup);
 	
 	}
@@ -549,7 +549,7 @@ public String disallowAllFunctionsForRole( String sessionid, String authzgroupid
  *
  * TODO: fix for if the functionname doesn't exist, it is still returning success - SAK-15334
  */
-public String disallowFunctionForRole( String sessionid, String authzgroupid, String roleid, String function) throws AxisFault
+public String disallowFunctionForRole( String sessionid, String authzgroupid, String roleid, String functionname) throws AxisFault
 {
 	Session session = establishSession(sessionid);
 	
@@ -557,7 +557,7 @@ public String disallowFunctionForRole( String sessionid, String authzgroupid, St
 
 		AuthzGroup authzgroup = AuthzGroupService.getAuthzGroup(authzgroupid);
 		Role role = authzgroup.getRole(roleid);
-		role.disallowFunction(function);
+		role.disallowFunction(functionname);
 		AuthzGroupService.save(authzgroup);
 	
 	}
