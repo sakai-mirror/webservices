@@ -1146,7 +1146,8 @@ public String getSitesUserCanAccess(String sessionid) throws AxisFault
 			return "<list/>";
 		}
 
-		// combine two lists
+		// Remove duplicates and combine two lists
+		allSites.removeAll( moreSites );
 		allSites.addAll( moreSites );
 		
 		Document dom = Xml.createDocument();
