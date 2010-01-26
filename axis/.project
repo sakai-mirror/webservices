@@ -1,0 +1,17 @@
+<projectDescription>
+  <name>sakai-axis</name>
+  <comment/>
+  <projects>
+    <project>sakai-component</project>
+    <project>sakai-util</project>
+    <project>sakai-util-axis</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>
