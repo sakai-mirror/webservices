@@ -42,6 +42,7 @@ import org.w3c.dom.Node;
 public class SakaiScript {
 	
 	private static final Log LOG = LogFactory.getLog(SakaiScript.class);
+	private static final String ADMIN_SITE_REALM = "/site/!admin";
 	
 private Session establishSession(String id) throws AxisFault 
 {
@@ -1144,6 +1145,11 @@ public boolean checkForUser(String sessionid, String eid) throws AxisFault
 public boolean checkForMemberInAuthzGroupWithRole(String sessionid, String eid, String authzgroupid, String role) throws AxisFault
 {
 	Session s = establishSession(sessionid);
+	
+	if (ADMIN_SITE_REALM.equalsIgnoreCase(authzgroupid) && !SecurityService.isSuperUser(s.getUserId())) {
+		LOG.warn("WS checkForMemberInAuthzGroupWithRole(): Permission denied. Restricted to super users.");
+		throw new AxisFault("WS checkForMemberInAuthzGroupWithRole(): Permission denied. Restricted to super users.");
+	}
 	
 	try {
 		AuthzGroup authzgroup = null; 
