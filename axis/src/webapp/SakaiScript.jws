@@ -48,6 +48,7 @@ import org.sakaiproject.time.api.TimeService;
 import java.util.Properties;
 import org.apache.axis.AxisFault;
 
+import org.sakaiproject.util.FormattedText;
 import org.sakaiproject.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -905,6 +906,15 @@ public String addNewSite( String sessionid, String siteid, String title, String 
 	
 	try {
 
+	    // check description
+	    if (description != null) {
+	        StringBuilder alertMsg = new StringBuilder();
+	        description = FormattedText.processFormattedText(description, alertMsg);
+	        if (description == null) {
+	        	throw new AxisFault("Site description markup rejected: " + alertMsg.toString());
+	        }
+	    }            
+	    
 		Site siteEdit = null;
 		siteEdit = SiteService.addSite(siteid, type);
 		siteEdit.setTitle(title);
@@ -989,6 +999,15 @@ public String copySite( String sessionid, String siteidtocopy, String newsiteid,
 				throw new AxisFault("WS copySite(): Permission denied. Must be super user to copy a site in which you are not a maintainer.");
 		}
 		
+		// check description
+		if (description != null) {
+	        	StringBuilder alertMsg = new StringBuilder();
+	        	description = FormattedText.processFormattedText(description, alertMsg);
+			if (description == null) {
+	        		throw new AxisFault("Site description markup rejected: " + alertMsg.toString());
+	        	}
+		}            
+	    
 		Site siteEdit = SiteService.addSite(newsiteid, site);
 		siteEdit.setTitle(title);
 		siteEdit.setDescription(description);
@@ -1614,7 +1633,16 @@ public String changeSiteDescription( String sessionid, String siteid, String des
 	Session session = establishSession(sessionid);
 	
 	try {
-
+		
+	    // check description
+	    if (description != null) {
+	        StringBuilder alertMsg = new StringBuilder();
+	        description = FormattedText.processFormattedText(description, alertMsg);
+	        if (description == null) {
+	        	throw new AxisFault("Site description markup rejected: " + alertMsg.toString());
+	        }
+	    }            
+	    
 		Site siteEdit = null;
 		siteEdit = SiteService.getSite(siteid);
 		siteEdit.setDescription(description);
