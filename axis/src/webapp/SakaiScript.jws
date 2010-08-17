@@ -209,9 +209,8 @@ public String changeUserInfo( String sessionid, String eid, String firstname, St
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = UserDirectoryService.getUserByEid(eid).getId();
 		userEdit = UserDirectoryService.editUser(userid);
 		userEdit.setFirstName(firstname);
@@ -220,9 +219,9 @@ public String changeUserInfo( String sessionid, String eid, String firstname, St
 		userEdit.setType(type);
 		userEdit.setPassword(password);
 		UserDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) { 
+		UserDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS removeUser(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -244,9 +243,8 @@ public String changeUserName( String sessionid, String eid, String firstname, St
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = UserDirectoryService.getUserByEid(eid).getId();
 		userEdit = UserDirectoryService.editUser(userid);
 		userEdit.setFirstName(firstname);
@@ -254,6 +252,7 @@ public String changeUserName( String sessionid, String eid, String firstname, St
 		UserDirectoryService.commitEdit(userEdit);
 	}
 	catch (Exception e) { 
+		UserDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserName(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -274,16 +273,15 @@ public String changeUserEmail( String sessionid, String eid, String email) throw
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = UserDirectoryService.getUserByEid(eid).getId();
 		userEdit = UserDirectoryService.editUser(userid);
 		userEdit.setEmail(email);
 		UserDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) { 
+		UserDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserEmail(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -304,15 +302,15 @@ public String changeUserType( String sessionid, String eid, String type) throws 
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-		UserEdit userEdit = null;
 		String userid = UserDirectoryService.getUserByEid(eid).getId();
 		userEdit = UserDirectoryService.editUser(userid);
 		userEdit.setType(type);
 		UserDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) { 
+		UserDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserType(): " + e.getClass().getName() + " : " + e.getMessage());
 		return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -333,16 +331,15 @@ public String changeUserPassword( String sessionid, String eid, String password)
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = UserDirectoryService.getUserByEid(eid).getId();
 		userEdit = UserDirectoryService.editUser(userid);
 		userEdit.setPassword(password);
 		UserDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) {
+		UserDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserPassword(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -626,7 +623,7 @@ public String allowFunctionForRole( String sessionid, String authzgroupid, Strin
 	Session session = establishSession(sessionid);
 	
 	// check that ONLY super user's are accessing this (see SAK-18494)
-	if (!securityService.isSuperUser(session.getUserId())) {
+	if (!SecurityService.isSuperUser(session.getUserId())) {
 		LOG.warn("WS allowFunctionForRole(): Permission denied. Restricted to super users.");
 		throw new AxisFault("WS allowFunctionForRole(): Permission denied. Restricted to super users.");
 	}
@@ -1706,7 +1703,7 @@ public String setSiteProperty(String sessionid, String siteid, String propname, 
 {
 	Session session = establishSession(sessionid);
 	
-	if (!securityService.isSuperUser())
+	if (!SecurityService.isSuperUser())
 	{
 		LOG.warn("WS setSiteProperty(): Permission denied. Restricted to super users.");
 		throw new AxisFault("WS setSiteProperty(): Permission denied. Restricted to super users.");
@@ -2154,10 +2151,12 @@ public String copyCalendarEvents(String sessionid, String sourceSiteId, String t
 	String calId1 = "/calendar/calendar/"+sourceSiteId+"/main"; 
 	String calId2 = "/calendar/calendar/"+targetSiteId+"/main"; 
 	
+	Calendar calendar1 = null;
+	CalendarEdit calendar2 = null;
 	try { 
 		//get calendars
-		Calendar calendar1 = CalendarService.getCalendar(calId1); 
-		CalendarEdit calendar2 = CalendarService.editCalendar(calId2); 
+		calendar1 = CalendarService.getCalendar(calId1); 
+		calendar2 = CalendarService.editCalendar(calId2); 
 	
 		//for every event in calendar1, add it to calendar2
 		List eventsList = calendar1.getEvents(null, null); 
@@ -2179,6 +2178,7 @@ public String copyCalendarEvents(String sessionid, String sourceSiteId, String t
 		CalendarService.commitCalendar(calendar2); 
 		
 	} catch (Exception e) { 
+		CalendarService.cancelCalendar(calendar2);
 		LOG.error("WS copyCalendarEvents(): error " + e.getClass().getName() + " : " + e.getMessage()); 
 		return e.getClass().getName() + " : " + e.getMessage(); 
 	} 
