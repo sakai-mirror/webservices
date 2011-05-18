@@ -221,12 +221,10 @@ public String removeUser( String sessionid, String eid) throws AxisFault
 	Session session = establishSession(sessionid);
 	
 	try {
-
 		UserEdit userEdit = null;
 		String userid = userDirectoryService.getUserByEid(eid).getId();
 		userEdit = userDirectoryService.editUser(userid);
 		userDirectoryService.removeUser(userEdit);
-	
 	}
 	catch (Exception e) {  
 		LOG.error("WS removeUser(): " + e.getClass().getName() + " : " + e.getMessage());
@@ -255,9 +253,8 @@ public String changeUserInfo( String sessionid, String eid, String firstname, St
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = userDirectoryService.getUserByEid(eid).getId();
 		userEdit = userDirectoryService.editUser(userid);
 		userEdit.setFirstName(firstname);
@@ -266,9 +263,9 @@ public String changeUserInfo( String sessionid, String eid, String firstname, St
 		userEdit.setType(type);
 		userEdit.setPassword(password);
 		userDirectoryService.commitEdit(userEdit);
-	
 	}
-	catch (Exception e) { 
+	catch (Exception e) {
+		userDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS removeUser(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -290,16 +287,16 @@ public String changeUserName( String sessionid, String eid, String firstname, St
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = userDirectoryService.getUserByEid(eid).getId();
 		userEdit = userDirectoryService.editUser(userid);
 		userEdit.setFirstName(firstname);
 		userEdit.setLastName(lastname);
 		userDirectoryService.commitEdit(userEdit);
 	}
-	catch (Exception e) { 
+	catch (Exception e) {
+		userDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserName(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -320,16 +317,15 @@ public String changeUserEmail( String sessionid, String eid, String email) throw
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = userDirectoryService.getUserByEid(eid).getId();
 		userEdit = userDirectoryService.editUser(userid);
 		userEdit.setEmail(email);
 		userDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) { 
+		userDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserEmail(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -350,15 +346,15 @@ public String changeUserType( String sessionid, String eid, String type) throws 
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-		UserEdit userEdit = null;
 		String userid = userDirectoryService.getUserByEid(eid).getId();
 		userEdit = userDirectoryService.editUser(userid);
 		userEdit.setType(type);
 		userDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) { 
+		userDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserType(): " + e.getClass().getName() + " : " + e.getMessage());
 		return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -379,16 +375,15 @@ public String changeUserPassword( String sessionid, String eid, String password)
 {
 	Session session = establishSession(sessionid);
 	
+	UserEdit userEdit = null;
 	try {
-
-		UserEdit userEdit = null;
 		String userid = userDirectoryService.getUserByEid(eid).getId();
 		userEdit = userDirectoryService.editUser(userid);
 		userEdit.setPassword(password);
 		userDirectoryService.commitEdit(userEdit);
-	
 	}
 	catch (Exception e) {
+		userDirectoryService.cancelEdit(userEdit);
 		LOG.error("WS changeUserPassword(): " + e.getClass().getName() + " : " + e.getMessage());
 	 	return e.getClass().getName() + " : " + e.getMessage();
 	}
@@ -413,7 +408,7 @@ public String getUserEmail( String sessionid ) throws AxisFault
 /**
  * Gets the email address for a given user
  *
- * Differs from original above as that one uses the session to get the displayname hence you must know this in advance or be logged in to the web services
+ * Differs from original above as that one uses the session to get the email address hence you must know this in advance or be logged in to the web services
  * with that user. This uses a userid as well so we could be logged in as admin and retrieve the email address for any user.
  * 
  * @param	sessionid	the id of a valid session
@@ -1940,7 +1935,7 @@ public boolean checkForRoleInAuthzGroup(String sessionid, String authzgroupid, S
  * This web service is returning everything it receives correctly though, so when
  * userDirectoryService.searchUsers() is amended, this will be even more complete.
  *
- * See: SAK-6792 and SAK-14268 for the releavnt Jira's tickets.
+ * See: SAK-6792 and SAK-14268 for the relevant JIRA tickets.
  *
  * @param	sessionid		the id of a valid session
  * @param	criteria		the search criteria.
@@ -2281,10 +2276,12 @@ public String copyCalendarEvents(String sessionid, String sourceSiteId, String t
 	String calId1 = "/calendar/calendar/"+sourceSiteId+"/main"; 
 	String calId2 = "/calendar/calendar/"+targetSiteId+"/main"; 
 	
+	Calendar calendar1 = null;
+	CalendarEdit calendar2 = null;
 	try { 
 		//get calendars
-		Calendar calendar1 = calendarService.getCalendar(calId1); 
-		CalendarEdit calendar2 = calendarService.editCalendar(calId2); 
+		calendar1 = calendarService.getCalendar(calId1); 
+		calendar2 = calendarService.editCalendar(calId2); 
 	
 		//for every event in calendar1, add it to calendar2
 		List eventsList = calendar1.getEvents(null, null); 
@@ -2306,6 +2303,7 @@ public String copyCalendarEvents(String sessionid, String sourceSiteId, String t
 		calendarService.commitCalendar(calendar2); 
 		
 	} catch (Exception e) { 
+		calendarService.cancelCalendar(calendar2);
 		LOG.error("WS copyCalendarEvents(): error " + e.getClass().getName() + " : " + e.getMessage()); 
 		return e.getClass().getName() + " : " + e.getMessage(); 
 	} 
