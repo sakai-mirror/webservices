@@ -139,21 +139,6 @@ public class ContentHosting {
  		return	contentHostingService.getSiteCollection(context);
 	}
 
-	/**
-	 *	A simple check to see if the session id passed is valid.
-	 *	'null' is returned if no longer valid, otherwise the session id is returned.
-	 *
-	 *	@author Mark Norton
-	 */
-	public String checkSession (String id) {
-		Session s = SessionManager.getSession(id);
-		if (s == null) {
-			return "null";
-		}
-		else {
-			return id;
-		}
-	}
 
 	/**
 	 *	Get the virtual root id.  The virtual root serves as a container for all of the 
@@ -187,7 +172,7 @@ public class ContentHosting {
 			return collection.getBodySizeK();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("getSiteCollectionSize(): " + e.getClass().getName() + " : " + e.getMessage());
 		}
 		return -1;
 	}
@@ -232,9 +217,9 @@ public class ContentHosting {
 			return Xml.writeDocumentToString(dom);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("getAllSitesCollectionSize(): " + e.getClass().getName() + " : " + e.getMessage());
 		}
-		return "<exception/>";
+		return "failure";
 	}
 
 
@@ -281,9 +266,9 @@ public class ContentHosting {
 			return newCollectionId;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("createFolder(): " + e.getClass().getName() + " : " + e.getMessage());
 		}
-		return "Failure";
+		return "failure";
 	}
 
 	/**
@@ -316,24 +301,21 @@ public class ContentHosting {
 			byte[] content = null;
 			if (binary) {
 				content = Base64.decode(contentMime);
-				System.out.println("File of size: " + content + " found");	
+				LOG.info("createContentItem(): File of size: " + content + " found");	
 			}
 			else {
 				content = contentMime.getBytes();
 			}
 			
-			//System.out.println("name is: " + name +" , collection: " + collectionId + " resp: " + props);
 			ContentResource cont = contentHostingService.addResource(name, collectionId, 10, type, content, props ,0);
 
-			//ContentResource cont = ContentHostingService.addResource(name, collectionId, 10,"content", 
-			//	contentMime, props, new ArrayList(), 1); 
-			return "Success";
+			return "success";
 		}
 	
 		catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("createContentItem(): " + e.getClass().getName() + " : " + e.getMessage());
 		}
-		return "Failure";
+		return "failure";
 	}
 
 
@@ -532,6 +514,7 @@ public class ContentHosting {
 	 *  <li>id - resource identifier</li>
 	 *  <li>name - display name</li>
 	 *  <li>type - resource type</li>
+	 *  </ul>
 	 *
 	 *  @author Mark Norton
 	 */
@@ -591,6 +574,7 @@ public class ContentHosting {
 	 *  <li>id - resource identifier</li>
 	 *  <li>name - display name</li>
 	 *  <li>type - resource type</li>
+	 *  </ul>
 	 *
 	 *  @author Mark Norton
 	 */
