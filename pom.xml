@@ -5,7 +5,7 @@
 	<name>Sakai WebServices Project</name>
   	<groupId>org.sakaiproject.webservices</groupId>
   	<artifactId>webservices</artifactId>
-  	<version>1.1-SNAPSHOT</version>
+  	<version>1.1.0-b05</version>
   	<packaging>pom</packaging>
   	
   	<parent>
@@ -49,9 +49,9 @@
     </modules>
     
     <scm>
-        <connection>scm:svn:https://source.sakaiproject.org/svn/webservices/branches/webservices-1.1.x</connection>
-        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/webservices/branches/webservices-1.1.x</developerConnection>
-        <url>https://source.sakaiproject.org/svn/webservices/branches/webservices-1.1.x</url>
+        <connection>scm:svn:https://source.sakaiproject.org/svn/webservices/tags/webservices-1.1.0-b05</connection>
+        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/webservices/tags/webservices-1.1.0-b05</developerConnection>
+        <url>https://source.sakaiproject.org/svn/webservices/tags/webservices-1.1.0-b05</url>
     </scm>
     
   	<dependencyManagement>
