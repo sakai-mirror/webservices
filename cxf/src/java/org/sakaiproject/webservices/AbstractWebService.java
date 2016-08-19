@@ -29,6 +29,7 @@ import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.shortenedurl.api.ShortenedUrlService;
 import org.sakaiproject.tool.assessment.samlite.api.SamLiteService;
 import org.sakaiproject.id.api.IdManager;
+import org.sakaiproject.lessonbuildertool.LessonBuilderAccessAPI;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
@@ -65,7 +66,7 @@ public class AbstractWebService {
     protected ShortenedUrlService shortenedUrlService;
     protected SamLiteService samLiteService;
     protected IdManager idManager;
-
+    protected LessonBuilderAccessAPI lessonBuilderAccessAPI;
     
     @WebMethod(exclude = true)
     public void init() {
@@ -219,4 +220,10 @@ public class AbstractWebService {
     public void setIdManager(IdManager idManager) {
         this.idManager = idManager;
     }
+
+    @WebMethod(exclude = true)
+    public void setLessonBuilderAccessAPI(LessonBuilderAccessAPI lessonBuilderAccessAPI) {
+        this.lessonBuilderAccessAPI = lessonBuilderAccessAPI;
+    }
+
 }
